@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <title></title>
+  </head>
+  <body>
+    <header></header>
+    <main>
+      <div class="container text-center">
+        <div class="row">
+          <div class="col">
+            <div class="mb-5"></div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="mb-3">
+              <h1 class="text-center">Game Idea Checker</h1>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <div class="mb-3 container-md">
+              <textarea class="form-control" id="input_prompt" placeholder="Введите свою игровую идею" style="height: 150px;"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col">
+            <button onclick="button_pressed()" id="submit_button" type="button" class="btn btn-primary btn-lg">
+              <span class="spinner-border spinner-border-sm visually-hidden" role="status" aria-hidden="true"></span>
+              Отправить
+            </button>
+            <div class="mb-5"></div>
+          </div>
+        </div>
+        <div class="row visually-hidden" id="idea_info">
+          <div class="col">
+            <p class="fs-3">Вашу идею оценили бы на:</p>
+            <p class="fs-2" id="score"></p>
+          </div>
+          <div class="col">
+            <p class="fs-3">Игру с такой идеей на старте купило бы:</p>
+            <p class="fs-2" id="purchases"></p>
+          </div>
+        </div>
+      </div>
+
+    </main>
+    <footer></footer>
+  </body>
+  <script>
+
+    function button_pressed(){
+      let btn = document.getElementById('submit_button');
+      btn.className = "btn btn-primary btn-lg disabled";
+      let spinner = document.getElementsByClassName('spinner-border')[0];
+      spinner.className = "spinner-border spinner-border-sm";
+      let form = document.getElementById('input_prompt');
+      document.getElementById('idea_info').className = "row visually-hidden";
+      fetch('/prompter',{
+        method: "POST",
+        body: JSON.stringify({
+          'prompt': form.value
+        }),
+        headers: {
+          "Content-type": "application/json; charset=UTF-8"
+        }
+      }).then((response) => response.json())
+      .then((json) => update(json))
+
+    };
+    function update(x){
+      let btn = document.getElementById('submit_button');
+      let spinner = document.getElementsByClassName('spinner-border')[0];
+      document.getElementById('idea_info').className = "row"
+      spinner.className = "spinner-border spinner-border-sm visually-hidden";
+      btn.className = "btn btn-primary btn-lg";
+
+      let score_elem = document.getElementById('score');
+      let purchases_elem = document.getElementById('purchases');
+      score_elem.textContent = (x['score']+1) + "/4";
+      purchases_elem.textContent = "~"+x['purchases'] + " людей";
+    };
+
+  </script>
+</html>
